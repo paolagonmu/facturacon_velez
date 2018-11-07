@@ -1,0 +1,81 @@
+body{
+  padding:20px;
+  zoom: 76%; 
+  background: #EFF4F9;
+}
+.borderless td, .borderless th {
+  border: none;
+}
+
+.heading {
+  background-color:#2C4E6C;
+  color:#FFF;
+  margin-bottom:1em;
+  text-align:center;
+  line-height:2.5em;
+}
+.input-tax  {
+  width: 50px;
+}
+.input-des  {
+  width:70px;
+}
+.label-info{
+  font-weight:bold;
+}
+.invoice-number-container * {
+  font-weight:bold;
+}
+
+.actions {
+  padding-top:1em;
+}
+input:focus {
+  outline: 0;
+}
+
+.tableBody{
+  background-color:#eff2f1;
+}
+/* linea separar*/
+.branding {
+  padding-bottom:2em;
+  border-bottom:8px solid #ddd;
+}
+.logo-container {
+  text-align:right;
+}
+
+.imgLogo{
+  width: 120px;
+  height: 70px;
+}
+
+.infos input{
+  width: 300px;
+}
+
+.align-right input{
+  text-align:right;
+  width: 300px;
+}
+
+div.container{
+  width: 1200px;
+}
+/*
+.ng-valid{
+  border: thin solid  #090;
+}
+
+.ng-invalid{
+  border: thin solid  #990000;
+}*/
+
+.myborder{
+  border: 2px rgb(223, 215, 215) solid;
+}
+
+.downNavBarColor{
+  background-color: #2C4E6C;
+}
