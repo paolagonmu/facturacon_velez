@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="finalizar">
+
+<head>
+    <title>Facturación Offline Velez</title>
+    <meta charset='utf-8'>
+    <meta name="description" content="App para la facturación offline de Velez">
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="dist/css/style.css">
+    <script src="./dist/js/lib/jquery-3.2.1.slim.min.js"></script>
+    <script type="text/javascript" src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/css" src="./node_modules/bootstrap/dist/css/bootstrap.min.css"></script>
+    <script type="text/javascript" src="./node_modules/angular/angular.min.js"></script>
+
+    <!--Libreiras de base de datos y logica de archivos-->
+    <script src="./dist/lib/config.js"></script>
+    <script src="./dist/lib/db.js"></script>
+    <script src="./dist/lib/files.js"></script>
+    <script src="./dist/lib/querySQlite.js"></script>
+    <script type="text/javascript" src="dist/js/finalizar.js"></script>
+
+
+</head>
+
+<body ng-controller="finalizar" ng-init="init()">
+    <div class="card" >
+        <div class="card-header text-success">
+            Creación de factura
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Se crea la factura: <span class="text-success">{{factura()}}</span></h5>
+          <a href="#" class="btn btn-success" ng-click="imprimir()">Imprimir factura</a>
+        </div>
+      </div>
+      <script src="./dist/lib/modal.js"></script>
+</body>
+
+</html>

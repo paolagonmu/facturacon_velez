@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="payment">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./dist/css/stylePayment.css">
+    <script type="text/javascript" src="./node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/angular/angular.js"></script>
+    <script src="./dist/js/lib/jquery-3.2.1.slim.min.js"></script>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="./node_modules/@fortawesome/fontawesome-free/css/all.min.css">
+    <script type="text/javascript" src="./node_modules/sweetalert/dist/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="./dist/css/style.css">
+    <!--Controlador-->
+    <script src="dist/js/payment.js"></script>
+
+    <!--Libreiras de base de datos y logica de archivos-->
+    <script src="./dist/lib/config.js"></script>
+    <script src="./dist/lib/db.js"></script>
+    <script src="./dist/lib/files.js"></script>
+    <script src="./dist/lib/querySQlite.js"></script>
+
+    <title>Metodo de pago</title>
+</head>
+<!--inicio del cuerpo html-->
+
+<body ng-controller="payment" ng-init="readInit()">
+    <div class="container">
+        <br>
+        <div class="row">
+            <!--Div donde va a ir el formulario de pagos -->
+            <div class=" col-md-6 panel borderless" id="segundodiv">
+                <div id="bar" >
+                    Medio de pago <i class="fas fa-coins"></i>
+                </div>
+
+                <div class="text-center"> <label id="numfact">Factura </label><span class="text-primary">
+                        <b>{{numFact}}</b></span>
+                </div>
+                <label class="text-info"><b>Total a Pagar: {{purchase | currency:"$":0 }}</b></label>
+                <br>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label ng-model="missing" class="text-danger">Valor Faltante: <b>{{calculateMissing() |
+                                currency:"$":0 }}</b></label>
+                    </div>
+                    <div class="col-md-1"></div>
+                    <div class="col-md-5">
+                        <h4 class="text-warning">Cambio: <b>{{leftover | currency:"$":0 }}</b></h4>
+                    </div>
+                </div>
+                <h4 class="text-center">Medios de pago</h4>
+
+
+
+                <!--botones que muestran los formularios-->
+                <div class="list-group">
+                    <a id="E" class="list-group-item" data-toggle="modal" data-target="#formEfectivo" data-whatever="@mdo"
+                        ng-click="opcMenu = 'E';" href=""><i class="far fa-money-bill-alt fa-1x"></i> Efectivo <span>${{totalCash}}
+                        </span></a>
+                    <a id="T" class="list-group-item" data-toggle="modal" data-target="#formTarjeta" data-whatever="@mdo"
+                        ng-click="opcMenu = 'T';" href=""><i class="far fa-credit-card fa-1x"></i> Tarjeta <span>${{totalCard}}
+                        </span></a>
+                </div>
+
+
+
+                <!--inicio del div para el formulario de pago en efectivo-->
+                <div ng-show="opcMenu === 'E'" id="divFormE">
+                    <br>
+                    <div class="text-center">
+                        <h5>EFECTIVO</h5>
+                        <br>
+                    </div>
+                    <form>
+                        <div class=" row">
+                            <div class=" col-sm-5"> </div>
+                            <div class=" form-group col-sm-6">
+                                <input type="button" id="btnCash" class="btn btn-warning center-block " value="="
+                                    ng-style="estilo" ng-click="writeMissing(this)" ng-disabled="dsbWriteCash">
+                            </div>
+                            <div class=" col-sm-1 "></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2"></div>
+                            <div class="col-md-8">
+                                <div class="row ">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-8">
+                                        <div class="text-center">
+                                            <label class="text-center">Valor a Pagar</label>
+                                        </div>
+                                        <input type="text" class="form-control" id="txtCash" ng-focus="clearformatMoney(valueCash,1)"
+                                            ng-blur="setMoney(valueCash,1)" ng-model="valueCash" ng-maxlength="20"
+                                            ng-disabled="dsbWriteCash" ng-change="validateNumbers(valueCash,1)">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2"></div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-5"></div>
+                            <div class="col-md-5">
+                                <input type="submit" id="btnPayCash" class="btn btn-primary center-block" value="Pagar"
+                                    ng-click="pay(valueCash,1)" ng-disabled="dsbWriteCash" ng-style="stylebotonpagoe">
+
+                            </div>
+                            <div class="col-md-2"></div>
+                        </div>
+                        <br>
+                    </form>
+                </div>
+                <!--fin del div que muestra formulario de pago en efectivo-->
+
+                <!--inicio del div que muestra formulario de pagos con tarjeta-->
+
+                <div ng-show="opcMenu === 'T'" id="divFormC">
+                    <br>
+                    <form>
+                        <div class="text-center">
+                            <h5>TARJETA</h5>
+                            <br>
+                        </div>
+                        <div class=" row">
+                            <div class=" col-sm-5"> </div>
+                            <div class=" form-group col-sm-6">
+                                <input type="button" id="btnCard" class="btn btn-warning center-block " value="="
+                                    ng-click="writeMissing(this)" ng-disabled="dsbWriteCard">
+                            </div>
+                            <div class=" col-sm-1 "></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-1"></div>
+                            <div class="col-m-6">
+                                <div class="form-group center-block">
+                                    &nbsp;&nbsp;&nbsp;<label>Tipos de tarjetas</label>
+                                    <select id="gbCards" class="form-control" ng-options="item as item.label for item in mediosPagosTarjetas track by item.id"
+                                        ng-model="typeCard" ng-disabled="dsbWriteCard"></select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group center-block">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label>4 digitos</label>
+                                    <input type="text" class="form-control" id="idDigits" ng-model="digits" ng-change="validateNumbers(digits,3)"
+                                        maxlength="4" minlength="1" ng-disabled="dsbWriteCard">
+                                </div>
+                            </div>
+
+                            <div class="col-md-1"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-1"></div>
+
+                            <div class="col-md-6">
+                                <div class="form-group center-block">
+                                    <label>Código de aprobación</label>
+                                    <input type="text" class="form-control center-block" id="idApproval" maxlength="20"
+                                        ng-model="approval" ng-disabled="dsbWriteCard">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group center-block">
+                                    <label>Valor a Pagar</label>
+                                    <input type="text" class="form-control" id="txtCard" ng-focus="clearformatMoney(valueCard,2)"
+                                        ng-blur="setMoney(valueCard,2)" ng-model="valueCard" ng-maxlength="20"
+                                        ng-disabled="dsbWriteCard" ng-change="validateNumbers(valueCard,2)">
+                                </div>
+                            </div>
+
+                            <div class="col-md-1"></div>
+                        </div>
+                        <br>
+
+
+                        <div class="row">
+                            <div class="col-md-5"></div>
+                            <div class="col-md-5">
+                                <input type="submit" id="btnPayCard" class="btn btn-primary center-block" value="Pagar"
+                                    ng-click="pay(valueCard,2)" ng-disabled="dsbWriteCard" ng-style="stylebotonpago">
+                            </div>
+                            <div class="col-md-2"></div>
+                        </div>
+
+                        <br>
+                    </form>
+                </div>
+                <!--fin del div que muestra formulario de pagos con tarjeta-->
+
+                <br>
+                <div class="row">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-9">
+                        <button type="button" id="btnBack" class="btn btn-default" ng-click="back()" ng-disabled="dsbBack"><i
+                                class="fas fa-arrow-alt-circle-left"></i> Regresar</button>
+                        <button type="button" id="btnSavePay" class="btn btn-info" ng-click="savePay(this)" ng-disabled="dsbSavePay"><i
+                                class="fas fa-save"></i> Guardar factura</button>
+                    </div>
+
+                </div>
+                <br>
+            </div>
+            <!--fin del div del formulario de pagos-->
+
+            <!--inicio de la tabla de pagos -->
+            <div class="col-md-6" id="3">
+                <h5 class="text-center text-primary">Informe de pagos &nbsp; <i class="fas fa-table"></i></h5>
+                <div class="col-md-2"></div>
+                <div class="col-md-4">
+                    <table class="table table-striped">
+                        <thead class="">
+                            <tr>
+                                <th scope="col">Factura</th>
+                                <th scope="col">Posicion</th>
+                                <th scope="col">Pago</th>
+                                <th scope="col">Valor</th>
+                                <th scope="col">Autorizacion</th>
+                                <th scope="col">Digitos</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng_repeat="item in dataPayment.pay_info track by $index"">
+      
+                                <td class="
+                                text-primary">{{item.numFact}}</td>
+                                <td>{{item.position}}</td>
+                                <td>{{item.type}}</td>
+                                <td class="text-success">{{item.amount}}</td>
+                                <td>{{item.authorization}}</td>
+                                <td>{{item.digits}}</td>
+                                <td><button type="
+                                button" class="btn btn-warning"
+                                        ng-click="removePay(item)" ng-disabled="disablefinpago"><i class="fas fa-times"></i></button></td>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <script src="./dist/lib/modal.js"></script>
+</body>
+
+</html>
