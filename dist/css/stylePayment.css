@@ -1,0 +1,69 @@
+body {
+  zoom: 90%;
+}
+
+.heading {
+  background-color: #357ebd;
+  color: #fff;
+  align-content: center;
+  text-align: center;
+  line-height: 2.5em;
+  margin-bottom: 1em;
+}
+
+.myBorder {
+  border: 2px rgb(223, 215, 215) solid;
+}
+.div.container {
+  width: 1000px;
+}
+#bar {
+  background-color: #357ebd;
+  color: #fff;
+  align-content: center;
+  text-align: center;
+  line-height: 2.5em;
+  margin-bottom: 1em;
+  margin-left: -16px;
+  width: 105%;
+}
+#txtCash {
+  border-radius: 8px 8px;
+}
+#idApproval {
+  border-radius: 8px 8px;
+  float: left;
+  margin-left: 1px;
+  width: 90%;
+}
+#txtCard {
+  border-radius: 8px 8px;
+  width: 95%;
+  margin-left: -20px;
+}
+#idDigits {
+  border-radius: 8px 8px;
+  width: 95%;
+  float: left;
+  margin-left: -50px;
+  margin-left: 20px;
+}
+#gbCards {
+  border-radius: 8px 8px;
+  width: 95%;
+  margin-left: 10px;
+}
+#divFormC {
+  border: 1px rgb(233, 227, 227) solid;
+}
+#divFormE {
+  border: 1px rgb(233, 227, 227) solid;
+}
+#numfact {
+  font-size: 20px;
+}
+
+#btnBack {
+  background-color: #357ebd;
+  color: White;
+}
