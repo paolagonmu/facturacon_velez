@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "packager": "electron-packager . Facturacion_Velez --overwrite --asar=true --platform=win32 --arch=ia32 --icon=dist/img/velez_icon.ico --prune=true --out=velez_facturacion_v3.2run --version-string.CompanyName=NETW --version-string.FileDescription=NETW --version-string.ProductName='FacturacionVelez'"
+    "packager": "electron-packager . Facturacion_Velez --overwrite --asar=true --platform=win32 --arch=ia32 --icon=dist/img/velez_icon.ico --prune=true --out=velez_facturacion_v3.2run --version-string.CompanyName=NETW --version-string.FileDescription=NETW --version-string.ProductName='FacturacionVelez'",
+    "test": "gulp jshint"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
