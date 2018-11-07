@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="print">
+
+<head>
+    <title>Factura Velez Outlet</title>
+    <script src="./dist/js/lib/jquery-3.2.1.slim.min.js"></script>
+    <script type="text/javascript" src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/css" src="./node_modules/bootstrap/dist/css/bootstrap.min.css"></script>
+    <script type="text/javascript" src="./node_modules/angular/angular.min.js"></script>
+    <script src="dist/js/print.js"></script>
+    <script src="dist/js/numText.js"></script>
+    <link rel="stylesheet" href="dist/css/print.css">
+</head>
+
+<body ng-controller="print" ng-init="readInit()" ng-click="print()">
+
+    <!--Cabecera-->
+    <div class="size">
+        <img src="{{img()}}" class="center img">
+        <div class="container center2">
+            <label>{{header(0)}} </label><br>
+            <label>{{header(1)}} </label><br>
+            <label>{{header(2)}} </label><br>
+            <label>{{header(3)}} </label><br>
+            <label>{{header(4)}} </label><br>
+            <label>{{header(5)}} </label><br>
+        </div>
+    </div>
+    <td class="size">---------------------------------------------------</td>
+    <!--SPACE-->
+    <div class="size center2">
+        <label> ORIGINAL </label>
+    </div>
+    <td class="size">---------------------------------------------------</td>
+    <!--Detalle sitio-->
+    <div class="container size">
+        <div class="row">
+            <div class="col-sm-4">
+                <table class="table ">
+                    <tbody class="tableBody">
+                        <tr>
+                            <td>Factura de Venta</td>
+                            <td>:{{invoice.invoice_number}}</td>
+                        </tr>
+                        <tr>
+                            <td>Fecha - Hora</td>
+                            <td>:{{currentDate()}} </td>
+                        </tr>
+                        <tr>
+                            <td>Almacen - Codigo</td>
+                            <td>:{{shop()}}</td>
+                        </tr>
+                        <tr>
+                            <td>Caja </td>
+                            <td>:{{factOffline.caja}}</td>
+                        </tr>
+                        <tr>
+                            <td>Ciudad</td>
+                            <td>:{{factOffline.ciudad}}</td>
+                        </tr>
+                        <tr>
+                            <td>Vendedor</td>
+                            <td>:{{invoice.seller_info.idseller}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <td class="size">---------------------------------------------------</td>
+    <!--Detalle cliente-->
+    <div class="container size">
+        <div class="row">
+            <div>
+                <!--Datos del cliente-->
+                <table class="table">
+                    <tbody class="tableBody">
+                        <tr>
+                            <td>Nombres</td>
+                            <td>:{{allName()}}</td>
+                        </tr>
+                        <tr>
+                            <td>Cédula</td>
+                            <td>:{{invoice.client_info.idclient}} </td>
+                        </tr>
+                        <tr>
+                            <td>Email</td>
+                            <td>{{invoice.client_info.email}}</td>
+                        </tr>
+                        <tr>
+                            <td>Teléfono </td>
+                            <td>:{{invoice.client_info.tel}} </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--Productos facturados-->
+                <table>
+                    <thead>
+                        <tr>
+                            <th>CODIGO</th>
+                            <th>PRECIO</th>
+                            <th>DESC</th>
+                            <th>CANT</th>
+                            <th>VALOR</th>
+                        </tr>
+                    </thead>
+                    <tr ng-repeat="item in invoice.items track by $index">
+                        <td>
+                            <label>{{item.code}}</label>
+                        </td>
+                        <td>
+                            <label>{{item.cost}}</label>
+                        </td>
+                        <td>
+                            <label>{{removePercZero(item.descUni)}}</label>
+                        </td>
+                        <td>
+                            <label>{{item.qty}}</label>
+                        </td>
+                        <td>
+                            <label>{{formatCoin(item.cosTot)}}</label>
+                        </td>
+
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <td class="size">---------------------------------------------------</td><br>
+    <!--Datos calculados-->
+    <div class="container size">
+        <div>
+            <!--Datos del cliente-->
+            <table class="table">
+                <tbody class="tableBody">
+                    <tr>
+                        <td>VENTA BRUTA</td>
+                        <td>{{formatCoin(invoice.subTotal)}}</td>
+                    </tr>
+                    <tr>
+                        <td>DESCUENTOS</td>
+                        <td>{{formatCoin(invoice.discountTotal)}}</td>
+                    </tr>
+                    <tr>
+                        <td>IVA {{factOffline.iva}}%</td>
+                        <td>{{formatCoin(invoice.taxTotal)}}</td>
+                    </tr>
+                    <tr>
+                        <td>TOTAL </td>
+                        <td>{{formatCoin(invoice.amountTotal)}}</td>
+                    </tr>
+                    <tr>
+                        <td>RECIBIDO</td>
+                        <td class="size">--------------------------------------------</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!--Metodo de pago-->
+    <div class="container size">
+        <div class="row">
+            <div class="col-sm-4">
+                <table>
+                    <tbody>
+                        <tr ng-repeat="item in dataPayment.pay_info track by $index">
+                            <td>
+                                <label>{{item.type}}</label>
+                            </td>
+                            <td>
+                                <label>{{item.amount}}</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>TOTAL RECIBIDO</td>
+                            <td>{{formatCoin(received())}}</td>
+                        </tr>
+                        <tr>
+                            <td>CAMBIO</td>
+                            <td><label>{{formatCoin(leftover)}}</label></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <label>Valor en letras </label><br>
+                <label>{{numText(invoice.amountTotal)}} </label>
+            </div>
+        </div>
+    </div>
+
+    <!--Pie de pagina-->
+    <div class="container size just">
+        <p>{{factOffline.textoFacturaPie}}</p>
+    </div>
+    <!--Firma-->
+    <br><br><br>
+    <div class="container size">
+        <label>Firma cliente:</label>
+        <label>__________________________</label><br>
+        <label>Cédula:</label>
+        <label>__________________________</label>
+    </div>
+</body>
+
+</html>

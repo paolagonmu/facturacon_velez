@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="fact_velez">
+
+<head>
+  <title>Facturación Offline Velez</title>
+  <meta charset='utf-8'>
+  <meta name="description" content="App para la facturación offline de Velez">
+  <script type="text/javascript" src="./node_modules/jquery/dist/jquery.min.js"></script>
+  <script type="text/javascript" src="./node_modules/angular/angular.min.js"></script>
+  <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+  
+  <link rel="stylesheet" href="./node_modules/@fortawesome/fontawesome-free/css/all.min.css">  
+  <link rel="stylesheet" href="dist/css/style.css">
+  <script src="./dist/js/lib/jquery-3.2.1.slim.min.js"></script>
+  <script type="text/javascript" src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="./node_modules/sweetalert/dist/sweetalert.min.js"></script>  
+  
+
+  
+  <script type="text/javascript" src="dist/js/renderer.js"></script>
+
+  <!--Libreiras de base de datos y logica de archivos-->
+  <script src="./dist/lib/config.js"></script>
+  <script src="./dist/lib/db.js"></script>
+  <script src="./dist/lib/files.js"></script>
+  <script src="./dist/lib/querySQlite.js"></script>
+  <script>
+    window.onload=iniciar;
+    function iniciar(){
+        db = new fnDataBase();
+        //Inicializar Query de consultas
+        var querySQL = new consultas();
+        //Crear base de datos Sqlite
+        db.fnCrearDB();
+        //Leo el archivo de configuracion
+        querySQL.archivoConfigTienda("FactOffline.json");
+
+        location.href="factura.html";
+
+    }
+  </script>
+
+</head>
+
+<body ng-controller="factVelezCtrl" ng-init="readInit()">
+</body>
+
+</html>

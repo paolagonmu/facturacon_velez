@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="fact_velez">
+
+<head>
+  <title>Facturación Offline Velez</title>
+  <meta charset='utf-8'>
+  <meta name="description" content="App para la facturación offline de Velez">
+  <script type="text/javascript" src="./node_modules/jquery/dist/jquery.min.js"></script>
+  <script type="text/javascript" src="./node_modules/angular/angular.min.js"></script>
+  <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+  
+  <link rel="stylesheet" href="./node_modules/@fortawesome/fontawesome-free/css/all.min.css">  
+  <link rel="stylesheet" href="dist/css/style.css">
+  <script src="./dist/js/lib/jquery-3.2.1.slim.min.js"></script>
+  <script type="text/javascript" src="./node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="./node_modules/sweetalert/dist/sweetalert.min.js"></script>  
+  
+
+  
+  <script type="text/javascript" src="dist/js/renderer.js"></script>
+
+  <!--Libreiras de base de datos y logica de archivos-->
+  <script src="./dist/lib/config.js"></script>
+  <script src="./dist/lib/db.js"></script>
+  <script src="./dist/lib/files.js"></script>
+  <script src="./dist/lib/querySQlite.js"></script>
+
+</head>
+
+<body ng-controller="factVelezCtrl" ng-init="readInit()">
+  <div class="container borderless" id="invoice">
+    <!--Barra de titulo-->
+    <div class="row">
+      <div class="col-sm-12 heading">
+        <i class="fas fa-file-invoice">{{nameShop()}}</i>
+      </div>
+    </div>
+    <!--Cabezera de factura-->
+    <div class="row ">
+      <div class="col-sm-3">
+        <label class="label-info">Cédula vendedor</label>
+        <input id="input1" ng-keyup="enter($event,1)" ng-focus="validarCreacion(1)" type="text" class="form-control" aria-label="Small"
+          aria-describedby="inputGroup-sizing-sm" ng-model="invoice.seller_info.idseller" maxlength="25">
+      </div>
+      <div class="col-sm-2">
+        <div class="invoice-number-container">
+          <label for="invoice-number">Factura # &nbsp;</label><input type="text" class="form-control" id="invoice-number"
+            ng-model="invoice.invoice_number" disabled />
+        </div>
+      </div>
+      <div class="col-sm-1">&nbsp;</div>
+      <div class="col-sm-2">
+        <div class="invoice-number-container">
+          <label for="invoice-number">Fecha &nbsp; </label><input type="text" class="form-control" id="system_date"
+            disabled value="{{currentDate()}}" />
+        </div>
+      </div>
+      <div class="col-sm-4 logo-container">
+        <b class="text-success">V 3.2</b>
+        <img id="company_logo" ng-src="{{ logo }}" alt="your logo" class="imgLogo" />
+      </div>
+    </div>
+    <div>&nbsp;</div>
+    <!--Datos de personas-->
+    <div>
+      <div class="row">
+        <div class="col-sm">
+          <label class="label-info">Identificación cliente</label>
+          <div class="input-group input-group-sm mb-3">
+            <input id="input2" ng-focus="validarCreacion(2)" ng-keyup="enter($event,2)" type="text" class="form-control" aria-label="Small"
+              aria-describedby="inputGroup-sizing-sm" ng-model="invoice.client_info.idclient" maxlength="25">
+          </div>
+        </div>
+        <div class="col-sm">
+          <label class="label-info">Nombre cliente</label>
+          <div class="input-group input-group-sm mb-3">
+            <input id="input3" ng-focus="validarCreacion(2)" ng-keyup="enter($event,3)" type="text" class="form-control" aria-label="Small"
+              aria-describedby="inputGroup-sizing-sm" ng-model="invoice.client_info.nameclient" maxlength="25">
+          </div>
+        </div>
+        <div class="col-sm">
+          <label class="label-info">Apellido cliente</label>
+          <div class="input-group input-group-sm mb-3">
+            <input id="input4" ng-focus="validarCreacion(2)" ng-keyup="enter($event,4)" type="text" class="form-control" aria-label="Small"
+              aria-describedby="inputGroup-sizing-sm" ng-model="invoice.client_info.lastnameclient" maxlength="40">
+          </div>
+        </div>
+        <div class="col-sm">
+          <label class="label-info">Email</label>
+          <div class="input-group input-group-sm mb-3">
+            <input id="input5" ng-focus="validarCreacion(2)" ng-keyup="enter($event,5)" type="email" class="form-control" aria-label="Small"
+              aria-describedby="inputGroup-sizing-sm" ng-model="invoice.client_info.email" maxlength="60">
+          </div>
+        </div>
+        <div class="col-sm">
+          <label class="label-info">Teléfono</label>
+          <div class="input-group input-group-sm mb-3">
+            <input id="input6" ng-focus="validarCreacion()"  ng-keyup="enter($event,6)"  type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm"
+              ng-model="invoice.client_info.tel" maxlength="10" minlength="7">
+          </div>
+          <label class="text-info"><b>Cantidad de articulos: {{accountant()}}</b></label>
+        </div>
+      </div>
+      
+    </div>
+
+    <div>&nbsp;</div>
+    <!--Tabla de articulos-->
+    <table class="table borderless">
+      <thead>
+        <tr>
+          <th>&nbsp;</th>
+          <th>Material</th>
+          <th>Cantidad</th>
+          <th>Precio </th>
+          <th>Descuento %</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody class="tableBody">
+        <tr class="invoice-item" ng-repeat="item in invoice.items track by $index">
+          <td>
+            <div class="col-xs-1 remove-item-container">
+              <a href="" ng-click="removeItem(item)" class="btn btn-danger"><i class="fas fa-times"></i></a>
+            </div>
+          </td>
+          <td>
+            <div class="col-xs-3 input-container">
+              <input id="product{{$index}}" ng-keypress="enterGeneric($event,$index,'producto')" type="text" class="form-control"
+                aria-label="Small" maxlength="16" ng-focus="validarCreacion(2)" ng-model="item.code" placeholder="Código de barras" />
+            </div>
+          </td>
+          <td>
+            <div class="col-xs-2 input-container">
+              <input type="text" class="form-control input-tax" aria-label="Small" ng-model="item.qty" ng-validate="integer"
+                disabled />
+            </div>
+          </td>
+          <td>
+            <div class="col-xs-2 input-container">
+              <input id="cost{{$index}}" ng-keypress="enterGeneric($event,$index,'desc')" ng-focus="clearMoney(item)"
+                ng-blur="formatCoin(item)" type="text" class="form-control" aria-label="Small" ng-model="item.cost"
+                ng-validate="number" placeholder="Precio" maxlength="21" />
+            </div>
+          </td>
+          <td>
+            <div class="col-xs-2 input-container">
+              <input id="desc{{$index}}" ng-keypress="enterGeneric($event,$index,'newLine')" type="text" class="form-control input-des"
+                aria-label="Small" ng-model="item.descUni" ng-validate="number" minlength="1" maxlength="3" placeholder="Descuento"
+                ng-focus="clearPerc(item)" ng-blur="formatPerc(item)" />
+            </div>
+          </td>
+          <td>
+            <div class="col-xs-2 text-right input-container">
+              <label ng-model="item.cosTot" class="text-primary">{{calculateUnit(this) | currency:"$":0}}</label>
+            </div>
+          </td>
+        </tr>
+        <div class="label-info">
+          <div class="col-xs-1"></div>
+          <div class="col-xs-11 add-item-container">
+            &nbsp;<a class="btn btn-primary" href ng-click="addItem()"><i class="fas fa-plus"></i></a>&nbsp;Nuevo
+            Producto
+          </div>
+        </div>
+      </tbody>
+    </table>
+    <!--Precios calculados-->
+    <div class="row">
+      <div class="col"></div>
+      <div class="col"></div>
+      <div class="col">
+        <table class="table ">
+          <tbody class="tableBody">
+            <tr>
+              <td>Subtotal:</td>
+              <td>{{invoiceSubTotal() | currency:"$":0}}</td>
+            </tr>
+            <tr>
+              <td>IVA {{IVA()}}% : </td>
+              <td> {{calculateTax(this) | currency:"$":0}}</td>
+            </tr>
+            <tr>
+              <td class="text-danger">Descuento: </td>
+              <td class="text-danger">{{calculateDesc() | currency:"$":0}}</td>
+            </tr>
+            <tr>
+              <td class="text-success"><b>Total:</b></td>
+              <td>
+                <p class="text-success"><b>{{calculateGrandTotal() | currency:"$":0}}</b></p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col">&nbsp;</div>
+  </div>
+
+  <!--Botones inferiores-->
+  <nav class="navbar navbar-expand-sm fixed-bottom justify-content-between downNavBarColor">
+    <a class="navbar-brand"></a>
+    <div>
+      <button class="btn btn-success label-info" ng-click="clearLocalStorage()">
+        <i class="fas fa-trash-alt"> Limpiar Factura</i>
+      </button>
+    </div>
+    <a class="navbar-brand"></a>
+    <a class="navbar-brand"></a>
+    <a class="navbar-brand"></a>
+    <a class="navbar-brand"></a>
+    <form class="form-inline">
+      <button class="btn btn-primary" ng-click="validate()">
+        <i class="fas fa-money-bill"> Realizar pago </i>
+      </button>
+    </form>
+    <a class="navbar-brand"></a>
+  </nav>
+</body>
+
+</html>
